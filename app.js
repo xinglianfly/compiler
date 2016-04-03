@@ -39,7 +39,11 @@ function HomeController($scope) {
                     if (generates[a].indexOf(head) > -1) {//包含非终结符号
                         conts += generates[a].replace(head, "") + head + "'" + "|";
                     } else {//不包含非终结符号
-                        notconts += generates[a] + head + "'" + "|";
+                        if(generates[a].indexOf("e")==-1){//如果是空
+                            notconts += generates[a] + head + "'" + "|";
+                        }else{
+                            notconts +=head+"'"+"|"
+                        }
                     }
                 }
 
