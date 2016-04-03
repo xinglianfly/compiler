@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="compiler">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container" ng-controller="HomeController as home">
+
+    <div class="row" style="margin-top: 60px;">
+        <div class="col-md-8">
+            <textarea class="form-control" rows="12" ng-model="home.textInput"></textarea>
+        </div>
+        <div class="col-md-4" >
+            <button class="btn btn-default" ng-click="home.avoid()">消除左递归</button>
+        </div>
+    </div>
+    <div class="row" style="margin-top: 60px;">
+        <div class="col-md-8">
+            <textarea class="form-control" rows="12"> {{home.textInput}}</textarea>
+        </div>
+    </div>
+
+</div>
+
+</body>
+
+<script src="bower_components/angular/angular.min.js"></script>
+<script src="app.js"></script>
+
+</html>

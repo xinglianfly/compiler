@@ -1,0 +1,15 @@
+{
+  "name": "compilers",
+  "version": "0.0.0",
+  "authors": [
+    "xinglianfly <2650454635@qq.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
