@@ -42,7 +42,7 @@ function HomeController($scope) {
                     }
                 }
 
-                console.log(notconts);
+                console.log(notconts.substr(0, notconts.length - 1));
                 console.log(conts + "e");// 最后一个是空
             }else{
                 console.log(grammer);
@@ -64,7 +64,7 @@ function HomeController($scope) {
                 if(tail.indexOf("|")>-1){
                     var allgers = tail.split("|");
                     for(var num = 0;num < allgers.length;num++){
-                        if(allgers.indexOf(head)==0){
+                        if(allgers[num].indexOf(head)==0){
                             return true;
                         }
                     }
