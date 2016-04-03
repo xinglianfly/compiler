@@ -24,6 +24,7 @@ function HomeController($scope) {
      * @param userinputs
      */
     function avoidImmediateLeftRecursor(userinputs){
+        home.textOutput="";
         for(var i=0;i<userinputs.length;i++){
             var grammer = userinputs[i];
             if(isImmediateLeftRecursor(grammer)) {
@@ -42,10 +43,11 @@ function HomeController($scope) {
                     }
                 }
 
-                console.log(notconts.substr(0, notconts.length - 1));
-                console.log(conts + "e");// 最后一个是空
+                home.textOutput+=notconts.substr(0, notconts.length - 1)+"\n";
+                home.textOutput+=conts + "e"+"\n"; // 最后一个是空
+
             }else{
-                console.log(grammer);
+                home.textOutput += grammer+"\n";
             }
 
 
