@@ -16,11 +16,25 @@
         <div class="col-md-4" >
             <button class="btn btn-default" ng-click="home.avoid()">消除左递归</button>
         </div>
+
+        <div class="col-md-4" >
+            <input class="btn btn-default" type="file" onchange="home.readFiles()" value="打开文件"/>
+        </div>
     </div>
     <div class="row" style="margin-top: 60px;">
         <div class="col-md-8">
             <textarea class="form-control" rows="12" ng-model="home.textOutput"></textarea>
         </div>
+        <div class="col-md-4" >
+            <button class="btn btn-default" ng-click="home.longestCommonPrefix()">提取左公因子</button>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top: 60px;">
+        <div class="col-md-8">
+            <textarea class="form-control" rows="12" ng-model="home.textcommonprefix"></textarea>
+        </div>
+
     </div>
 
 </div>
