@@ -10,19 +10,21 @@
 <div class="container" ng-controller="HomeController as home">
 
     <div class="row" style="margin-top: 60px;">
-        <div class="col-md-8">
+        <div class="col-md-4"  file="text" file-dropzone="text/plain" file-handler="home.dragHandler">
             <textarea class="form-control" rows="12" ng-model="home.textInput"></textarea>
         </div>
         <div class="col-md-4" >
             <button class="btn btn-default" ng-click="home.avoid()">消除左递归</button>
+            <input class="btn btn-default" type="file" file-change file-handler="home.dragHandler" value="打开文件"/>
         </div>
 
-        <div class="col-md-4" >
-            <input class="btn btn-default" type="file" onchange="home.readFiles()" value="打开文件"/>
+        <div class="col-md-4">
+
         </div>
+
     </div>
     <div class="row" style="margin-top: 60px;">
-        <div class="col-md-8">
+        <div class="col-md-4">
             <textarea class="form-control" rows="12" ng-model="home.textOutput"></textarea>
         </div>
         <div class="col-md-4" >
@@ -31,8 +33,18 @@
     </div>
 
     <div class="row" style="margin-top: 60px;">
-        <div class="col-md-8">
+        <div class="col-md-4">
             <textarea class="form-control" rows="12" ng-model="home.textcommonprefix"></textarea>
+        </div>
+
+    </div>
+
+
+    <div class="row" style="margin-top: 60px;">
+        <div class="col-md-4">
+            <textarea class="form-control" rows="12" ng-model="home.firstinput"></textarea>
+            <button class="btn btn-default" ng-click="home.findFirst()">first集合</button>
+
         </div>
 
     </div>

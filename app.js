@@ -5,11 +5,15 @@
 
 angular
     .module('compiler', [])
-    .controller('HomeController', HomeController);
+    .controller('HomeController', HomeController)
+    .directive('fileDropzone',fileDropzone)
+    .directive('fileChange',fileChange)
+;
 
 function HomeController($scope) {
 
     var home = this;
+
     home.avoid = function () {
 
         var userinputs = home.textInput.split("\n");//把用户的输入按照行分开
@@ -49,8 +53,208 @@ function HomeController($scope) {
 
     }
 
-    home.readFiles = function () {
 
+    /**
+     * 判断是否是大小写   以此来表示是终结符还是非终结符
+     * @param B
+     * @returns {boolean} true是大写
+     */
+    function isNonterminal(B) {
+        if (B=='∂'){
+            return false;
+        }
+
+        for(var b = 0 ;b<B.length;b++){
+            if(B[b]==B[b].toUpperCase()){//如果是大写的话
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    function compute_first(beta,first) {
+        var result=[];
+        if (beta.length==0 || beta[0]=="∂"){
+            result.push("∂");
+        }else{
+            if(!isNonterminal(beta[0])){//如果是终结符
+                result = beta[0];
+            }else{
+                result = first[beta[0]];
+
+            }
+            for(var rnum = 1;rnum<beta.length && first[beta[rnum-1].indexOf("∂")] == -1;rnum++){
+                var f = first[beta[rnum]];
+                f.pop("∂");
+                for(var fnum = 0;fnum < f.length;fnum++){
+                    result.push(f[fnum]);
+
+                }
+            }
+            if(rnum == beta.length && first[beta[rnum-1]].indexOf("∂") == -1){
+                result.push("∂");
+            }else{
+                result.pop("∂");
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * 计算follow的值
+     * @param first  first集合
+     */
+     function findFollow(userinput,first) {
+        var keys = Object.keys(first);
+        var follow_set = {};
+        var A,RHS,B;
+        var change = true;
+       for(var fnum = 0; fnum < keys.length;fnum++){//初始化  把follow集合的key写上去
+           follow_set[keys[fnum]] = "";
+       }
+
+
+        while (change){
+            change = false;
+            for(var unum = 0;unum < userinput.length;unum++){
+                A = userinput[unum].split("->")[0];
+                RHS = userinput[unum].split("->")[1];
+                for(var rnum = 0;rnum<RHS.split("|").length;rnum++){
+                    var btemp = RHS.split("|")[rnum];
+
+                    for(var jnum = 0;jnum < btemp.length;jnum++){
+                        B = btemp[jnum];
+                        if(isNonterminal(B)){//如果是非终结符的话
+                            var beta = [];
+                            for(var bj = jnum+1;bj <btemp.length;bj++){
+                                var nextnode = btemp.charAt(bj);
+                                if(bj+1 < btemp.length && btemp.charAt(bj+1)=='\''){//处理E'类似的有带'的,要当做一个字符
+                                    nextnode += btemp.charAt(bj+1);
+                                    ++bj;
+                                }
+                                beta.push(nextnode);
+                            }
+
+                            compute_first(beta,first);
+                        }
+                    }
+                }
+
+            }
+        }
+
+
+    }
+
+
+    /**
+     * 查找FIRST集合
+     */
+    home.findFirst = function () {
+
+        var first = {};
+        // var userinput = ["S->ABc","A->a|$","B->b"];
+        // var userinput = ["E->TE'",
+        //     "E'->+TE'|e",
+        //     "T->FT'",
+        //     "T'->*FT'|e",
+        //     "F->i|(E)"
+        // ];
+
+        var userinput = ["A->BaAb|cC",
+           "B->d|l",
+            "C->eA|l",
+        ];
+        var map = {};
+        for(var i  = 0; i < userinput.length; i++){
+            var split1 = userinput[i].split("->");
+            var split2 = split1[1].split("|");
+            map[split1[0]]= split2;
+        }
+        Object.size = function(map) {
+            var size = 0, key;
+            for (key in map) {
+                if (map.hasOwnProperty(key))
+                    size++;
+            }
+            return size;
+        };
+        for(var b = 0 ; b <Object.size(map);b++){
+            firstCore(Object.keys(map)[b],map[Object.keys(map)[b]]);
+        }
+
+
+        console.log("first 集合如下:"+first);
+
+        findFollow(userinput,first);
+
+        function firstCore(leftnode,rightnodes) {
+            if (leftnode in first){
+                return first[leftnode];
+            }
+
+            var st = [];
+            for(var ii = 0;ii < rightnodes.length;ii ++){
+                for(var aa = 0 ; aa < rightnodes[ii].length;aa++){
+                    var nextnode = rightnodes[ii].charAt(aa);
+                    if(nextnode in map ){//非终结点
+
+                        if(aa+1 < rightnodes[ii].length && rightnodes[ii].charAt(aa+1)=='\''){
+                            nextnode += rightnodes[ii].charAt(aa+1);
+                            ++aa;
+                        }
+
+                        if(nextnode in map){
+                            var temst = firstCore(nextnode, map[nextnode]);
+                            st = st.concat(temst);
+                            if(temst.indexOf("$")>-1){
+
+                            }else{
+                                break;
+
+                            }
+                        }
+
+
+
+
+                    }else{//终结点
+                        st.push(nextnode.charAt(0));
+                        break;
+                    }
+                }
+            }
+
+            first[leftnode]= st;
+            return st;
+                }
+    }
+
+
+
+
+
+
+    /**
+     * 选择文件读取文件内容操作
+     * @param files
+     */
+    home.readFiles = function (files) {
+        var reader = new FileReader();
+        reader.onload= function (evt) {//回调操作
+            $scope.$apply(function () {//一个异步操作,读完文件之后,异步更新界面
+                home.textInput = evt.target.result;
+            })
+        }
+        reader.readAsText(files[0]);//读取第0个文件
+    }
+    
+    
+    home.dragHandler = function (fileText) {
+        home.textInput = fileText;
     }
 
     /**
@@ -206,6 +410,101 @@ function HomeController($scope) {
     }
 
 
+
 }
+
+
+function fileChange() {
+    return {
+        restrict:'A',//代表只能用在哪里 A代表的是属性  如果定义成E的话,表示可以用于元素名 如果定义成C的话,表示用在css中
+        // require:'ngModel',//代表需要依赖谁,这里是需要依赖ngmodel
+        scope:{//相关内容是怎么处理的
+            fileHandler:'=' //表示当做函数来用的
+        },
+        link:function link(scope,element,attrs,ctrl) {//在元素上面加一个监听器,当元素不使用的时候,就关掉监听器
+            element.on('change',onChange);
+            scope.$on('destroy',function () {
+                element.off('change',onChange);
+            });
+            function onChange() {
+                var reader = new FileReader();
+                reader.onload = function (evt) {
+                    scope.$apply(function () {
+                        scope.fileHandler(evt.target.result);
+                    })
+                };
+                reader.readAsText(element[0].files[0]);
+
+            }
+        }
+
+    }
+
+   
+}
+
+
+function fileDropzone() {
+    return {
+        restrict: 'A',//表示当做一个属性来用
+        scope: {
+           //等号是用来取值的,这里表示当做一个变量来用
+            fileHandler:'=',
+            fileType:'@'//可以取字符串的值
+        },
+        link: function(scope, element, attrs) {
+            var checkSize, isTypeValid, processDragOverOrEnter, validMimeTypes;
+
+            //dragOver或者dragenter时间
+            processDragOverOrEnter = function(event) {
+                event.stopPropagation();
+                event.preventDefault();
+                return false;
+            };
+
+            //获得文件mime类型
+            
+            validMimeTypes = attrs.fileDropzone;
+
+
+
+            isTypeValid = function(type) {//判断是否是图片类型
+                if ((validMimeTypes === (void 0) || validMimeTypes === '') || validMimeTypes.indexOf(type) > -1) {
+                    return true;
+                } else {
+                    alert("无效文件.上传文件必须是" + validMimeTypes);
+                    return false;
+                }
+            };
+
+            //元素绑定事件
+            element.on('dragover', processDragOverOrEnter);
+            element.on('dragenter', processDragOverOrEnter);
+
+
+            return element.on('drop', function(event) {//绑定drop事件
+                var file,  reader, type;
+                if (event != null) {
+                    event.preventDefault();
+                }
+                reader = new FileReader();
+                reader.onload = function(evt) {
+                    if (isTypeValid(type)) {//判断大小和类型是不是符合条件
+                        return scope.$apply(function() {
+                            scope.fileHandler(evt.target.result);
+                            
+                        });
+                    }
+                };
+
+                file = event.dataTransfer.files[0];
+                type = file.type;
+                reader.readAsText(file);
+                return false;
+            });
+        }
+    };
+}
+
 
 
