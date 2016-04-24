@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+
 </head>
 <body>
 
@@ -18,11 +20,23 @@
             <input class="btn btn-default" type="file" file-change file-handler="home.dragHandler" value="打开文件"/>
         </div>
 
-        <div class="col-md-4">
+
+
+    </div>
+    <div class="col-md-4" >
+        <button class="btn btn-default" ng-click="home.stepExc()">单步执行</button>
+    </div>
+    <div class="row" style="margin-top: 60px;">
+
+    <div class="col-md-8">
+        <pre ng-repeat="arith in home.avoidLeftRecursorArith">
+           <span ng-style="{background: $index == home.phaseIndex -1 ? 'red' : 'white'}"> {{arith.name}}</span>
+        </pre>
+    </div>
+
 
         </div>
 
-    </div>
     <div class="row" style="margin-top: 60px;">
         <div class="col-md-4">
             <textarea class="form-control" rows="12" ng-model="home.textOutput"></textarea>
