@@ -1,0 +1,38 @@
+.item-listing.ng-enter {
+    animation: fadeIn 1s;
+}
+
+.item-listing.ng-leave {
+    animation: fadeOut 1s;
+}
+
+
+body {
+    padding-top: 60px;
+}
+
+#ex1Slider .slider-selection {
+    background: #BABABA;
+}
+
+pre .line5 {
+    display: block;
+    background: red;
+}
+
+
+text {
+    font: bold 48px monospace;
+}
+
+.enter {
+    fill: green;
+}
+
+.update {
+    fill: #333;
+}
+
+.exit {
+    fill: brown;
+}

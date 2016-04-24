@@ -10,6 +10,7 @@
 <body>
 
 <div class="container" ng-controller="HomeController as home">
+    <svg id="test"></svg>
 
     <div class="row" style="margin-top: 60px;">
         <div class="col-md-4"  file="text" file-dropzone="text/plain" file-handler="home.dragHandler">
@@ -66,8 +67,11 @@
 </div>
 
 </body>
-
+<script src="bower_components/seiyria-bootstrap-slider/dist/bootstrap-slider.min.js"></script>
 <script src="bower_components/angular/angular.min.js"></script>
+<script src="bower_components/d3/d3.min.js"></script>
+<script src="bower_components/angular-animate/angular-animate.min.js"></script>
 <script src="app.js"></script>
+<script src="test.js"></script>
 
 </html>
