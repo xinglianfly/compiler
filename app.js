@@ -15,20 +15,19 @@ function HomeController($scope) {
     var home = this;
     home.counter = 0;
 
-    home.ii = 0;
-    home.j = 0;
+    var avoidLeftRecursorVeriable = {ii:0,j:0};//消除左递归用到的全局变量
+
     home.textOutput = "";
 
-    home.avoidLeftRecursorArith = [{name: "(1） 把文法G的所有非终结符按任一顺序排列，例如，A1，A2，…，An", color: {'background-color': 'blue'}},
-        {name: "（2）for （i＝1；i<=n；i++）", color: {'background-color': ''}},
-        {name: "       for （j＝1；j<=i－1；j++）", color: {'background-color': ''}},
-        {
-            name: "             把形如Ai→Ajγ的产生式改写成Ai→δ1γ /δ2γ /…/δkγ ,其中Aj→δ1 /δ2 /…/δk是关于的Aj全部规则；",
-            color: {'background-color': ''}
-        },
-        {name: "    消除Ai规则中的直接左递归；", color: {'background-color': ''}},
+    home.avoidLeftRecursorArith = ["(1） 把文法G的所有非终结符按任一顺序排列，例如，A1，A2，…，An",
+        "（2）for （i＝1；i<=n；i++）",
+        "       for （j＝1；j<=i－1；j++）",
 
-        {name: "（3） 化简由（2）所得到的文法，即去掉多余的规则", color: {'background-color': ''}}];
+        "             把形如Ai→Ajγ的产生式改写成Ai→δ1γ /δ2γ /…/δkγ ,其中Aj→δ1 /δ2 /…/δk是关于的Aj全部规则；",
+
+        "    消除Ai规则中的直接左递归；",
+
+       "（3） 化简由（2）所得到的文法，即去掉多余的规则"];
 
 
     home.avoid = function () {
@@ -83,57 +82,120 @@ function HomeController($scope) {
         return tailii;
     }
 
+    /**
+     * 模拟算法的一步一步执行
+     */
     home.stepExc = function () {
         if (home.phaseIndex == 3) {
-            if (home.j < home.ii) {
-                home.j++;
+            if (avoidLeftRecursorVeriable.j < avoidLeftRecursorVeriable.ii) {
+                avoidLeftRecursorVeriable.j++;
                 home.counter++;
             } else {
-                if (home.ii < 3) {
-                    home.j = 0;
+                if (avoidLeftRecursorVeriable.ii < 3) {
+                    avoidLeftRecursorVeriable.j = 0;
                     home.counter = home.counter + 2;
-                    home.ii++;
+                    avoidLeftRecursorVeriable.ii++;
                 } else {
                     home.counter++;
                 }
             }
         } else if (home.phaseIndex == 5) {
-            if (home.ii < 3) {
+            if (avoidLeftRecursorVeriable.ii < 3) {
                 home.counter = 2;
 
             } else {
                 home.counter++;
             }
             var userinputs = home.textInput.split("\n");//把用户的输入按照行分开
-            var headii = userinputs[home.ii - 1].split("->")[0];
-            var tailii = userinputs[home.ii - 1].split("->")[1];
+            var headii = userinputs[avoidLeftRecursorVeriable.ii - 1].split("->")[0];
+            var tailii = userinputs[avoidLeftRecursorVeriable.ii - 1].split("->")[1];
 
 
-            for (var j = 0; j < home.ii - 1; j++) {
+            for (var j = 0; j < avoidLeftRecursorVeriable.ii - 1; j++) {
 
 
-                tailii = changeRules(userinputs, home.ii - 1, j);
+                tailii = changeRules(userinputs, avoidLeftRecursorVeriable.ii - 1, j);
 
             }
-            userinputs[home.ii - 1] = headii + "->" + tailii;//将能带入的式子带入后重新构建用户的输入来消除立即左递归
+            userinputs[avoidLeftRecursorVeriable.ii - 1] = headii + "->" + tailii;//将能带入的式子带入后重新构建用户的输入来消除立即左递归
 
-            avoidImmediateLeftRecursor(userinputs[home.ii - 1]);//消除ii立即左递归
+            avoidImmediateLeftRecursor(userinputs[avoidLeftRecursorVeriable.ii - 1]);//消除ii立即左递归
 
         }
         else if (home.phaseIndex == 4) {
-            if (home.j < home.ii) {
+            if (avoidLeftRecursorVeriable.j < avoidLeftRecursorVeriable.ii) {
                 home.counter--;
             } else {
                 home.counter = 3;
             }
         }
         else if (home.phaseIndex == 6) {
-            
+
         } else {
             home.counter++;
         }
 
         home.phaseIndex = home.counter;
+
+
+    }
+
+
+    /**
+     * 消除立即左递归
+     * @param userinputs 用户的输入
+     */
+    function avoidImmediateLeftRecursor(grammer) {
+        if (isImmediateLeftRecursor(grammer)) {
+            var parts = grammer.split("->");
+            var head = parts[0];
+            var tail = parts[1].trim();
+            var generates = tail.split("|");
+            var conts = head + "'" + "->";
+            var notconts = head + "->";
+            for (var a = 0; a < generates.length; a++) {
+                //分为两种情况
+                if (generates[a].indexOf(head) > -1) {//包含非终结符号
+                    conts += generates[a].replace(head, "") + head + "'" + "|";
+                } else {//不包含非终结符号
+                    if (generates[a].indexOf("ε") == -1) {//如果是空
+                        notconts += generates[a] + head + "'" + "|";
+                    } else {
+                        notconts += head + "'" + "|"
+                    }
+                }
+            }
+
+            home.textOutput += notconts.substr(0, notconts.length - 1) + "\n";
+            home.textOutput += conts + "ε" + "\n"; // 最后一个是空 ε代表是空
+
+        } else {
+            home.textOutput += grammer + "\n";
+        }
+
+
+        /**
+         * 判断是否有立即左递归
+         * @param grammer
+         */
+        function isImmediateLeftRecursor(grammer) {
+            if (grammer.indexOf("->") > -1) {//代表是否含有"->"
+                var head = grammer.split("->")[0];
+                var tail = grammer.split("->")[1];
+                //包含"或者"符号
+                if (tail.indexOf("|") > -1) {
+                    var allgers = tail.split("|");
+                    for (var num = 0; num < allgers.length; num++) {
+                        if (allgers[num].indexOf(head) == 0) {
+                            return true;
+                        }
+                    }
+
+                }
+            }
+
+            return false;
+        }
 
 
     }
@@ -397,64 +459,7 @@ function HomeController($scope) {
         home.textInput = fileText;
     }
 
-    /**
-     * 消除立即左递归
-     * @param userinputs 用户的输入
-     */
-    function avoidImmediateLeftRecursor(grammer) {
-        if (isImmediateLeftRecursor(grammer)) {
-            var parts = grammer.split("->");
-            var head = parts[0];
-            var tail = parts[1].trim();
-            var generates = tail.split("|");
-            var conts = head + "'" + "->";
-            var notconts = head + "->";
-            for (var a = 0; a < generates.length; a++) {
-                //分为两种情况
-                if (generates[a].indexOf(head) > -1) {//包含非终结符号
-                    conts += generates[a].replace(head, "") + head + "'" + "|";
-                } else {//不包含非终结符号
-                    if (generates[a].indexOf("ε") == -1) {//如果是空
-                        notconts += generates[a] + head + "'" + "|";
-                    } else {
-                        notconts += head + "'" + "|"
-                    }
-                }
-            }
 
-            home.textOutput += notconts.substr(0, notconts.length - 1) + "\n";
-            home.textOutput += conts + "ε" + "\n"; // 最后一个是空 ε代表是空
-
-        } else {
-            home.textOutput += grammer + "\n";
-        }
-
-
-        /**
-         * 判断是否有立即左递归
-         * @param grammer
-         */
-        function isImmediateLeftRecursor(grammer) {
-            if (grammer.indexOf("->") > -1) {//代表是否含有"->"
-                var head = grammer.split("->")[0];
-                var tail = grammer.split("->")[1];
-                //包含"或者"符号
-                if (tail.indexOf("|") > -1) {
-                    var allgers = tail.split("|");
-                    for (var num = 0; num < allgers.length; num++) {
-                        if (allgers[num].indexOf(head) == 0) {
-                            return true;
-                        }
-                    }
-
-                }
-            }
-
-            return false;
-        }
-
-
-    }
 
     /**
      * 将用户的输入提取左公因子
