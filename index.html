@@ -30,7 +30,9 @@
 
             <div class="col-md-8">
         <pre ng-repeat="arith in home.avoidLeftRecursorArith">
-           <span ng-style="{background: $index == home.phaseIndex -1 ? 'red' : 'white'}"> {{arith}}</span>
+           <!--<span ng-style="{background: $index == home.phaseIndex -1 ? 'red' : 'white'}"> {{arith}}</span>-->
+                       <span ng-style="home.lineStyle($index)"> {{arith}}</span>
+
         </pre>
             </div>
         </div>
@@ -74,7 +76,6 @@
 <script src="bower_components/angular-animate/angular-animate.min.js"></script>
 <script src="js/parser.js"></script>
 <script src="js/EoLR.js"></script>
-<script src="js/avoidLeftRecursor.js"></script>
-<script src="test.js"></script>
+<script src="js/eliminateLeftRecursor.js"></script>
 
 </html>

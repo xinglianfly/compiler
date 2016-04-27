@@ -30,7 +30,6 @@ F->(E)|i
 
                 "（3） 化简由（2）所得到的文法，即去掉多余的规则"];
             this.avoidLeftRecursorVeriable = {ii: 0, j: 0};//消除左递归用到的全局变量
-            this.phaseIndex=0;
 
         }
 
@@ -214,9 +213,5 @@ F->(E)|i
 
     }
 
-    let eoLR = new EoLR();
-    eoLR.compute(raw_grammar);
-    console.log(eoLR.grammar);
-    console.log(eoLR.phases);
 
     
